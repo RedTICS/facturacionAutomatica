@@ -1,12 +1,11 @@
-import * as configFacturacionAutomatica from '../../schemas/config-prestaciones';
-import * as configJson from '../../configJson/configJson';
+import * as configFacturacionAutomatica from './schemas/config-prestaciones';
+import * as configJson from './configJson/configJson';
 
-export class FacturaSumar {
+export class Factura{
 
     async facturar(pool, prestacion) {
-        let datosConfiguracionAutomatica = await this.getConfigFacturacionAutomatica(prestacion);
-        
-        console.log("Robomon: ", datosConfiguracionAutomatica);
+        /* Traigo colección de configFacturacionAutomatica */
+        let datosConfiguracionAutomatica = await this.getConfigFacturacionAutomatica(prestacion);        
 
         let process = await configJson.jsonFacturacion(pool, prestacion, datosConfiguracionAutomatica);        
     }

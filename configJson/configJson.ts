@@ -1,21 +1,19 @@
 import * as moment from 'moment';
-import { QuerySumar } from './../facturacion/sumar/query-sumar';
+import * as facturaSumar from './../facturacion/sumar/factura-sumar';
 
-export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutomatica) {    
-    let querySumar = new QuerySumar()
-
-    let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, prestacion.paciente.dni);
+export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutomatica) {
 
     let facturacion = {
         /* Prestación Otoemisiones */
         '2091000013100': {
             term: "otoemisiones",
             preCondicion: function () {
-                let valido = false;
+                /* TODO: terminar precondicion*/
+                let valido = true;
 
-                if (afiliadoSumar) {
-                    valido = true;
-                }
+                // if (afiliadoSumar) {
+                //     valido = true;
+                // }
 
                 return valido;
             },
@@ -61,55 +59,32 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         }
     }
 
-    if (facturacion[prestacion.prestacion.conceptId].preCondicion()) {
-        let procesar = await facturacion[prestacion.prestacion.conceptId].process()
-        console.log("Procesando...: ", procesar)
+    let dtoSumar: any = {};
+    let dtoRecuperoFinanciero: any = {};
 
-        let dtoComprobante = {
-            cuie: prestacion.organizacion.cuie,
-            fechaComprobante: new Date(),
-            claveBeneficiario: afiliadoSumar.clavebeneficiario,
-            idAfiliado: afiliadoSumar.id_smiafiliados,
-            fechaCarga: new Date(),
-            comentario: 'Carga Automática',
-            periodo: moment(new Date, 'YYYY/MM/DD').format('YYYY') + '/' + moment(new Date, 'YYYY/MM/DD').format('MM'),
-            activo: 'S',
-            idTipoPrestacion: 1,
-            objectId: prestacion.turno._id
-        };
+    if (prestacion.obraSocial) {
 
-        let idComprobante = await querySumar.saveComprobanteSumar(pool, dtoComprobante);
-        let precioPrestacion = await querySumar.getNomencladorSumar(pool, datosConfiguracionAutomatica.sumar.idNomenclador)
-
-        prestacion = {
-            idComprobante: idComprobante,
-            idNomenclador: datosConfiguracionAutomatica.sumar.idNomenclador,
-            cantidad: 1,
-            precioPrestacion: precioPrestacion.precio,
-            idAnexo: 301,
-            peso: 0,
-            tensionArterial: '00/00',
-            diagnostico: procesar.diagnostico,
-            edad: moment(new Date()).diff(prestacion.paciente.fechaNacimiento, 'years'),
-            sexo: (prestacion.paciente.sexo === 'masculino') ? 'M' : 'F',
-            fechaNacimiento: prestacion.paciente.fechaNacimiento,
-            fechaPrestacion: new Date(),
-            anio: moment(prestacion.paciente.fechaNacimiento).format('YYYY'),
-            mes: moment(prestacion.paciente.fechaNacimiento).format('MM'),
-            dia: moment(prestacion.paciente.fechaNacimiento).format('DD'),
-        }
-
-        let idPrestacion = await querySumar.savePrestacionSumar(pool, prestacion);        
-
-        let datosReportables = {
-            idPrestacion: idPrestacion,
-            idDatoReportable: datosConfiguracionAutomatica.sumar.idDatosReportables,
-            valor: procesar.datosReportables
-        }
-       
-        let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);        
-       
     } else {
-        console.log("No cumple con la precondición")
+        /* El paciente no tiene Obra Social y se factura por SUMAR*/
+        
+        if (facturacion[prestacion.prestacion.conceptId].preCondicion()) {
+            let procesar = await facturacion[prestacion.prestacion.conceptId].process()
+
+            dtoSumar = {
+                objectId: prestacion.turno._id,
+                cuie: prestacion.organizacion.cuie,
+                diagnostico: procesar.diagnostico,
+                dniPaciente: prestacion.paciente.dni,
+                edad: moment(new Date()).diff(prestacion.paciente.fechaNacimiento, 'years'),
+                sexo: (prestacion.paciente.sexo === 'masculino') ? 'M' : 'F',
+                fechaNacimiento: prestacion.paciente.fechaNacimiento,
+                anio: moment(prestacion.paciente.fechaNacimiento).format('YYYY'),
+                mes: moment(prestacion.paciente.fechaNacimiento).format('MM'),
+                dia: moment(prestacion.paciente.fechaNacimiento).format('DD'),
+                valorDatoReportable: procesar.datosReportables
+            }
+
+            facturaSumar.facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
+        }
     }
 }

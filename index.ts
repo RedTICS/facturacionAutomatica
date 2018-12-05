@@ -1,6 +1,6 @@
 import { prestacionDTO } from './dto-webhook';
 import { SipsDBConfiguration } from './config.private';
-import { FacturaSumar } from './facturacion/sumar/facturacionSumar';
+import { Factura } from './factura';
 
 const sql = require('mssql');
 const mongoose = require('mongoose');
@@ -11,14 +11,9 @@ export async function facturar() {
     sql.close();
     let pool = await sql.connect(SipsDBConfiguration);
 
-    let facturaSumar = new FacturaSumar();
+    let factura = new Factura();
 
-    if (prestacionDTO.obraSocial) {
-        console.log("Tiene OS ");
-    } else {
-        facturaSumar.facturar(pool, prestacionDTO);
-        console.log("Nooo Tiene OS ");
-    }
+    factura.facturar(pool, prestacionDTO);
 }
 
 facturar();
