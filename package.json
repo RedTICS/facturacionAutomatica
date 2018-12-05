@@ -1,0 +1,21 @@
+{
+  "name": "facturacion_automatica",
+  "version": "1.0.0",
+  "description": "Sistema de facturación automática para Recupero Financiero y Sumar",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fantasy",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^10.12.7",
+    "moment": "^2.22.2",
+    "mongoose": "^5.3.12",
+    "mssql": "^4.2.3",
+    "typescript": "^3.1.6"
+  },
+  "devDependencies": {
+    "@types/es6-promise": "^3.3.0"
+  }
+}
