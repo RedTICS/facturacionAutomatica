@@ -3,8 +3,7 @@ import { QuerySumar } from './query-sumar';
 
 let querySumar = new QuerySumar()
 
-export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {
-    console.log("Entra a factura Sumar")
+export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {   
 
     let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, dtoSumar.dniPaciente);
 

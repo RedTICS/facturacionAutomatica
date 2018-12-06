@@ -13,6 +13,7 @@ export const prestacionDTO = {
         conceptId: '2091000013100',
         term: "screening de otoemisión acústica neonatal (procedimiento)",
         fsn: "screening de otoemisión acústica neonatal (procedimiento)",
+        // datosReportables: null
         datosReportables: [
             {
                 conceptId: '371580005',
