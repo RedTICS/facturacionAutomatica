@@ -10,7 +10,8 @@ let configFacturacionAutomaticaSchema = new mongoose.Schema({
     recuperoFinanciero: {
         descripcion: { type: String },
         idNomenclador: { type: String },
-        codigo: { type: String }
+        codigo: { type: String },
+        idServicio: { type: String }
     },
     sumar: {
         descripcion: { type: String },

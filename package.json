@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^10.12.7",
+    "chalk": "^2.4.1",
+    "figlet": "^1.2.1",
     "moment": "^2.22.2",
     "mongoose": "^5.3.12",
     "mssql": "^4.2.3",

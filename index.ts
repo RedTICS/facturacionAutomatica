@@ -4,8 +4,17 @@ import { Factura } from './factura';
 
 const sql = require('mssql');
 const mongoose = require('mongoose');
+const chalk = require('chalk');
+const log = console.log;
+const figlet = require('figlet');
 
 export async function facturar() {
+    // log(chalk.red.bold(
+    //     figlet.textSync('Fantasy Machine', {
+    //         horizontalLayout: 'default',
+    //         font: 'banner'
+    //     })
+    // ));
     mongoose.connect('mongodb://localhost:27017/andes', { useNewUrlParser: true });
 
     sql.close();

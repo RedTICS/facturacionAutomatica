@@ -44,6 +44,7 @@ export const prestacionDTO = {
     organizacion: {
         nombre: "HOSPITAL PROVINCIAL NEUQUEN - DR. EDUARDO CASTRO RENDON",
         cuie: "Q06391",
+        idSips: 205
     },
     obraSocial: null,
     /* Usar este para los que tienen OS*/
@@ -54,6 +55,6 @@ export const prestacionDTO = {
     profesional: {
         nombre: "MARIA LAURA",
         apellido: "MONTEVERDE",
-        documento: "25204237",
+        dni: "25204237",
     }
 }

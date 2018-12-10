@@ -3,15 +3,13 @@ import { QuerySumar } from './query-sumar';
 
 let querySumar = new QuerySumar()
 
-export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {   
-
-    let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, dtoSumar.dniPaciente);
+export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {    
 
     let dtoComprobante = {
         cuie: dtoSumar.cuie,
         fechaComprobante: new Date(),
-        claveBeneficiario: afiliadoSumar.clavebeneficiario,
-        idAfiliado: afiliadoSumar.id_smiafiliados,
+        claveBeneficiario: dtoSumar.claveBeneficiario,
+        idAfiliado: dtoSumar.idAfiliado,
         fechaCarga: new Date(),
         comentario: 'Carga Automática',
         periodo: moment(new Date, 'YYYY/MM/DD').format('YYYY') + '/' + moment(new Date, 'YYYY/MM/DD').format('MM'),
@@ -49,5 +47,5 @@ export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
         valor: dtoSumar.valorDatoReportable
     }
 
-    let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);  
+    let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);
 }
