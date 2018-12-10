@@ -69,8 +69,6 @@ export class QuerySumar {
 
         if (result && result.recordset) {            
             let idDatoReportable = result.recordset[0].id;
-            console.log("Result Dato Reportabkle: ", idDatoReportable);
-
         }
     }
 

@@ -20,21 +20,20 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
                 let esAfiliado = (afiliadoSumar) ? true : false;
                 let datosReportables = (prestacion.prestacion.datosReportables) ? true : false;
-                console.log("Es Afiliado: ", esAfiliado);
+
                 let conditionsArray = [
                     esAfiliado,
                     datosReportables
                 ]
-                console.log("Condociones Sumar: ", conditionsArray);
+
                 if (conditionsArray.indexOf(false) === -1) {
                     valido = true;
                 }
-                console.log("Valido: ", valido);
+
                 return valido;
             },
             sumar: async function (prestacion) {
 
-                // if (this.preCondicionSumar(prestacion)) {
                 let prestacionArr = prestacion.prestacion;
                 let configAutomArr = datosConfiguracionAutomatica.sumar;
 
@@ -69,7 +68,6 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 };
 
                 return dto;
-                // }
             },
             recupero: function (prestacion) {
                 let dto = {
@@ -88,7 +86,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
             }
         },
 
-        /* Prestación Niños Sano */
+        /* Prestación Niño Sano */
         '2091000013101': {
             term: "niño sano",
         }
@@ -98,12 +96,11 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let dtoRecupero: any = {};
 
     let main = await facturacion[prestacion.prestacion.conceptId].main(prestacion);
-    console.log("Afialidosss fuera precon: ", afiliadoSumar);
+    
     if (main.factura === 'sumar') {
-        console.log("Entra a Sumar y precondicon: ", main);
+    
         if (main.preCondicion) {
-
-            console.log("Afialidosss en precon: ", afiliadoSumar);
+    
             dtoSumar = {
                 objectId: prestacion.turno._id,
                 cuie: prestacion.organizacion.cuie,
