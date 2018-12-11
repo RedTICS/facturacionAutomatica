@@ -16,7 +16,7 @@ let configFacturacionAutomaticaSchema = new mongoose.Schema({
     sumar: {
         descripcion: { type: String },
         codigo: { type: String },
-        idDatosReportables: { type: String },
+        // idDatosReportables: { type: String },
         diagnostico: mongoose.Schema.Types.Mixed,
         datosReportables: mongoose.Schema.Types.Mixed,
         idNomenclador: { type: String }

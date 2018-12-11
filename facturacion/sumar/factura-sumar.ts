@@ -3,7 +3,7 @@ import { QuerySumar } from './query-sumar';
 
 let querySumar = new QuerySumar()
 
-export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {    
+export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica) {
 
     let dtoComprobante = {
         cuie: dtoSumar.cuie,
@@ -43,9 +43,13 @@ export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
 
     let datosReportables = {
         idPrestacion: idPrestacion,
-        idDatoReportable: datosConfiguracionAutomatica.sumar.idDatosReportables,
+        idDatoReportable: dtoSumar.idDatoReportable,
         valor: dtoSumar.valorDatoReportable
     }
 
     let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);
+}
+
+export async function saveBeneficiario() {
+
 }

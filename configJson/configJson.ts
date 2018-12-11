@@ -10,7 +10,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let querySumar = new QuerySumar();
 
     let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, prestacion.paciente.dni);
-    console.log("Afialidosss: ", afiliadoSumar);
+
     let facturacion = {
         /* Prestación Otoemisiones */
         '2091000013100': {
@@ -33,28 +33,43 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 return valido;
             },
             sumar: async function (prestacion) {
-
+                /* Ver el id  dato reportable */
                 let prestacionArr = prestacion.prestacion;
                 let configAutomArr = datosConfiguracionAutomatica.sumar;
 
                 function findObjectByKey(array, keys, value) {
-                    let dr = '';
+                    console.log("Array: ", array);
+                    console.log("Value: ", value);
+                    let dr = {
+                        idDatoReportable: '',
+                        datoReportable: ''
+                    };
 
                     for (let i = 0; i < array.length; i++) {
                         for (let x = 0; x < value.length; x++) {
-                            if (array[i][keys[0]] === value[x].conceptId) {
+                            let valueArr = value[0].valores;
 
-                                for (let y = 0; y < value.length; y++) {
-                                    if (array[i][keys[1]][keys[0]] === value[y].conceptId) {
-                                        dr += value[x].valor + value[y].valor + '/';
+                            for (let y = 0; y < valueArr.length; y++) {
+
+                                if (array[i][keys[0]] === valueArr[y].conceptId) {                                
+
+                                    for (let p = 0; p < valueArr.length; p++) {
+
+                                        if (array[i][keys[1]][keys[0]] === valueArr[p].conceptId) {
+                                            dr.datoReportable += valueArr[y].valor + valueArr[p].valor + '/';
+                                            
+                                        }
+
                                     }
-                                }
 
+                                }
                             }
                         }
                     }
+                    dr.idDatoReportable = value[0].idDatosReportables;
+                    dr.datoReportable = dr.datoReportable.slice(0, -1);
 
-                    return dr = dr.slice(0, -1);
+                    return dr;
                 }
 
                 let keys = ['conceptId', 'valor'];
@@ -63,10 +78,10 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 let dto: any = {
                     factura: 'sumar',
                     preCondicion: await this.preCondicionSumar(prestacion),
-                    diagnostico: configAutomArr.diagnostico[0].diagnostico,
+                    diagnostico: configAutomArr.diagnostico[0].diagnostico,                    
                     datosReportables: datoReportable
                 };
-
+                
                 return dto;
             },
             recupero: function (prestacion) {
@@ -96,11 +111,11 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let dtoRecupero: any = {};
 
     let main = await facturacion[prestacion.prestacion.conceptId].main(prestacion);
-    
+
     if (main.factura === 'sumar') {
-    
+        
         if (main.preCondicion) {
-    
+
             dtoSumar = {
                 objectId: prestacion.turno._id,
                 cuie: prestacion.organizacion.cuie,
@@ -114,10 +129,13 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 anio: moment(prestacion.paciente.fechaNacimiento).format('YYYY'),
                 mes: moment(prestacion.paciente.fechaNacimiento).format('MM'),
                 dia: moment(prestacion.paciente.fechaNacimiento).format('DD'),
-                valorDatoReportable: main.datosReportables
+                idDatoReportable: main.datosReportables.idDatoReportable,
+                valorDatoReportable: main.datosReportables.datoReportable
             }
-
+            console.log("Main: ", main);
             facturaSumar.facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica);
+        } else if (afiliadoSumar) {
+
         }
     } else if (main.factura === 'recupero') {
 
