@@ -40,14 +40,17 @@ export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
     }
 
     let idPrestacion = await querySumar.savePrestacionSumar(pool, prestacion);
-
-    let datosReportables = {
-        idPrestacion: idPrestacion,
-        idDatoReportable: dtoSumar.idDatoReportable,
-        valor: dtoSumar.valorDatoReportable
+ 
+    for  (let x = 0; x < dtoSumar.datosReportables.length; x++) {
+        let datosReportables = {
+            idPrestacion: idPrestacion,
+            idDatoReportable: dtoSumar.datosReportables[x].idDatoReportable,
+            valor: dtoSumar.datosReportables[x].datoReportable
+        }
+    
+        let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);
     }
-
-    let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);
+    
 }
 
 export async function saveBeneficiario() {

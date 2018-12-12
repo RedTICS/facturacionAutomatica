@@ -1,6 +1,7 @@
-import { prestacionDTO } from './dto-webhook';
+import * as prestaciones from './dto-webhook';
 import { SipsDBConfiguration } from './config.private';
 import { Factura } from './factura';
+import { prestacionOtoemisiones } from './dto-webhook';
 
 const sql = require('mssql');
 const mongoose = require('mongoose');
@@ -22,7 +23,7 @@ export async function facturar() {
 
     let factura = new Factura();
 
-    factura.facturar(pool, prestacionDTO);
+    factura.facturar(pool, prestaciones.prestacionOtoemisiones);
 }
 
 facturar();
