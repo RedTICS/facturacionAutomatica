@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 
 let configFacturacionAutomaticaSchema = new mongoose.Schema({
+    expresionSnomed: { type: String },
     prestacionSnomed: {
         conceptId: { type: String },
         term: { type: String },

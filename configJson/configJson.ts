@@ -3,8 +3,6 @@ import * as facturaSumar from './../facturacion/sumar/factura-sumar';
 import * as facturaRecupero from './../facturacion/recupero-financiero/factura-recupero';
 
 import { QuerySumar } from './../facturacion/sumar/query-sumar';
-// import { QueryRecupero } from './../facturacion/recupero-financiero/query-recupero';
-// import { prestacionDTO } from '../dto-webhook';
 
 export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutomatica) {
     let querySumar = new QuerySumar();
@@ -13,7 +11,8 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
     let facturacion = {
         /* Prestación Otoemisiones */
-        '2091000013100': {
+        /* TODO: poner la expresión que corresponda */
+        '1': {
             term: "otoemisiones",
             sumar: async function (prestacion) {
                 let prestacionArr = prestacion.prestacion;
@@ -77,9 +76,10 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
             }
         },
 
-        /* Prestación Niño Sano */
-        '410621008': {
-            term: "niño sano",
+        /* Prestación Niño Sano 410621008*/
+        /* TODO: poner la expresión que corresponda */
+        '10': {
+            term: "consulta de niño sano, recién nacido",
             sumar: async function (prestacion) {
                 let prestacionArr = prestacion.prestacion;
                 let configAutomArr = datosConfiguracionAutomatica.sumar.datosReportables;
@@ -119,6 +119,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 return dto;
             },
             main: function (prestacion) {
+                console.log("Entra al mainnnnn");
                 if (prestacion.obraSocial) {
                     return this.recupero();
                 } else {
@@ -150,7 +151,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let dtoSumar: any = {};
     let dtoRecupero: any = {};
 
-    let main = await facturacion[prestacion.prestacion.conceptId].main(prestacion);
+    let main = await facturacion[datosConfiguracionAutomatica.expresionSnomed].main(prestacion);
 
     if (main.factura === 'sumar') {
         if (facturacion[main.factura].preCondicionSumar(prestacion)) {
@@ -169,7 +170,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 dia: moment(prestacion.paciente.fechaNacimiento).format('DD'),
                 datosReportables: main.datosReportables
             }
-            console.log("DTO SUmar: ", dtoSumar);
+
             facturaSumar.facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica);
         } else if (afiliadoSumar) {
 

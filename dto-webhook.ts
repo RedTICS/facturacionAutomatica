@@ -11,7 +11,8 @@ export const prestacionNiñoSano = {
         sexo: 'masculino'
     },
     prestacion: {
-        conceptId: '410621008',
+        // conceptId: '410621008',
+        conceptId: '410620009',
         term: "consulta de niño sano, recién nacido",
         fsn: "consulta de niño sano, recién nacido (procedimiento)",
         // datosReportables: null
