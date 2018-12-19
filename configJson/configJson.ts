@@ -18,8 +18,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
             sumar: async function (prestacion) {
                 const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
                 const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
-
-                // let datoReportable = [];
+                
                 let dr = {
                     idDatoReportable: '',
                     datoReportable: ''
@@ -38,13 +37,13 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 dr.datoReportable = dr.datoReportable.slice(0, -1);
 
                 datoReportable.push(dr);
-                
+
                 let dto: any = {
                     factura: 'sumar',
                     diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
                     datosReportables: datoReportable
                 };
-                
+
                 return dto;
             },
             recupero: function (prestacion) {
@@ -69,34 +68,26 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         '410620009': {
             term: "consulta de niño sano, recién nacido",
             sumar: async function (prestacion) {
-                let prestacionArr = prestacion.prestacion;
-                let configAutomArr = datosConfiguracionAutomatica.sumar.datosReportables;
+                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
+                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
+                let x = 0;
 
-                let keys = ['conceptId', 'valor'];
-                // let datoReportable = [];
+                arrayPrestacion.forEach((element, index) => {
+                    let data = arrayConfiguracion.find(obj => obj.conceptId == element.conceptId);
 
-                findObjectByKey(prestacionArr.datosReportables, keys, configAutomArr);
+                    let dr = {
+                        idDatoReportable: '',
+                        datoReportable: ''
+                    };
 
-                function findObjectByKey(array, keys, value) {
+                    if (data) {
+                        dr.idDatoReportable = datosConfiguracionAutomatica.sumar.datosReportables[x].idDatosReportables;
+                        dr.datoReportable = element.valor;
 
-                    for (let i = 0; i < array.length; i++) {
-
-                        for (let x = 0; x < value.length; x++) {
-                            if (array[i][keys[0]] == value[x].valores.conceptId) {
-                                let dr = {
-                                    idDatoReportable: '',
-                                    datoReportable: ''
-                                };
-
-                                dr.idDatoReportable = value[i].idDatosReportables;
-                                dr.datoReportable = array[i].valor;
-
-                                datoReportable.push(dr);
-                            }
-                        }
+                        datoReportable.push(dr);
+                        x++;
                     }
-                    return datoReportable;
-                }
+                });
 
                 let dto: any = {
                     factura: 'sumar',

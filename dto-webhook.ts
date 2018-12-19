@@ -23,6 +23,11 @@ export const prestacionNiñoSano = {
                 valor: '15'
             },
             {
+                conceptId: '12345',
+                term: 'prueba borrar',
+                valor: '555'
+            },
+            {
                 conceptId: '248338008',
                 term: 'percentilo de talla',
                 valor: '80'
