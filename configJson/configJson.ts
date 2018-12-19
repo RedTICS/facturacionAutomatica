@@ -8,6 +8,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let querySumar = new QuerySumar();
 
     let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, prestacion.paciente.dni);
+    let datoReportable = [];
 
     let facturacion = {
         /* Prestación Otoemisiones */
@@ -18,7 +19,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
                 const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
 
-                let datoReportable = [];
+                // let datoReportable = [];
                 let dr = {
                     idDatoReportable: '',
                     datoReportable: ''
@@ -37,6 +38,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 dr.datoReportable = dr.datoReportable.slice(0, -1);
 
                 datoReportable.push(dr);
+                
                 let dto: any = {
                     factura: 'sumar',
                     diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
@@ -71,7 +73,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 let configAutomArr = datosConfiguracionAutomatica.sumar.datosReportables;
 
                 let keys = ['conceptId', 'valor'];
-                let datoReportable = [];
+                // let datoReportable = [];
 
                 findObjectByKey(prestacionArr.datosReportables, keys, configAutomArr);
 
