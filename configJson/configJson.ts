@@ -8,6 +8,10 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let querySumar = new QuerySumar();
 
     let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, prestacion.paciente.dni);
+
+    const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
+    const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
+
     let datoReportable = [];
 
     let facturacion = {
@@ -15,10 +19,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         /* TODO: poner la expresión que corresponda */
         '2091000013100': {
             term: "otoemisiones",
-            sumar: async function (prestacion) {
-                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
-                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
-                
+            sumar: function () {
                 let dr = {
                     idDatoReportable: '',
                     datoReportable: ''
@@ -38,27 +39,27 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
                 datoReportable.push(dr);
 
-                let dto: any = {
-                    factura: 'sumar',
-                    diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
-                    datosReportables: datoReportable
-                };
-
-                return dto;
+                return datoReportable;
             },
-            recupero: function (prestacion) {
+            recupero: function () {
                 let dto = {
                     factura: 'recupero'
                 }
 
                 return dto;
             },
-            main: function (prestacion) {
+            main: async function (prestacion) {
 
                 if (prestacion.obraSocial) {
                     return this.recupero();
                 } else {
-                    return this.sumar(prestacion);
+                    let dto: any = {
+                        factura: 'sumar',
+                        diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
+                        datosReportables: await this.sumar()
+                    };
+
+                    return dto;
                 }
             }
         },
@@ -67,9 +68,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         /* TODO: poner la expresión que corresponda */
         '410620009': {
             term: "consulta de niño sano, recién nacido",
-            sumar: async function (prestacion) {
-                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
-                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
+            sumar: async function () {
                 let x = 0;
 
                 arrayPrestacion.forEach((element, index) => {
@@ -89,20 +88,20 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                     }
                 });
 
-                let dto: any = {
-                    factura: 'sumar',
-                    diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
-                    datosReportables: datoReportable
-                };
-
-                return dto;
+                return datoReportable;
             },
-            main: function (prestacion) {
+            main: async function (prestacion) {
                 console.log("Entra al mainnnnn");
                 if (prestacion.obraSocial) {
                     return this.recupero();
-                } else {
-                    return this.sumar(prestacion);
+                } else {                    
+                    let dto: any = {
+                        factura: 'sumar',
+                        diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
+                        datosReportables: await this.sumar()
+                    };
+
+                    return dto;
                 }
             }
         },
