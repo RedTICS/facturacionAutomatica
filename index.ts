@@ -23,8 +23,8 @@ export async function facturar() {
 
     let factura = new Factura();
 
-    // factura.facturar(pool, prestaciones.prestacionOtoemisiones);
-    factura.facturar(pool, prestaciones.prestacionNiñoSano);
+    //factura.facturar(pool, prestaciones.prestacionOtoemisiones);
+     factura.facturar(pool, prestaciones.prestacionNiñoSano);
 }
 
 facturar();
