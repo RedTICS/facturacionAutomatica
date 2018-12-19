@@ -20,6 +20,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         '2091000013100': {
             term: "otoemisiones",
             sumar: function () {
+                console.log("Entra a otoemisiones");
                 let dr = {
                     idDatoReportable: '',
                     datoReportable: ''
@@ -48,20 +49,6 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
                 return dto;
             },
-            main: async function (prestacion) {
-
-                if (prestacion.obraSocial) {
-                    return this.recupero();
-                } else {
-                    let dto: any = {
-                        factura: 'sumar',
-                        diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
-                        datosReportables: await this.sumar()
-                    };
-
-                    return dto;
-                }
-            }
         },
 
         /* Prestación Niño Sano 410621008*/
@@ -69,6 +56,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         '410620009': {
             term: "consulta de niño sano, recién nacido",
             sumar: async function () {
+                console.log("Entra a niño sano");
                 let x = 0;
 
                 arrayPrestacion.forEach((element, index) => {
@@ -90,19 +78,18 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
                 return datoReportable;
             },
-            main: async function (prestacion) {
-                console.log("Entra al mainnnnn");
-                if (prestacion.obraSocial) {
-                    return this.recupero();
-                } else {                    
-                    let dto: any = {
-                        factura: 'sumar',
-                        diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
-                        datosReportables: await this.sumar()
-                    };
+        },
+        main: async function (prestacion) {
+            if (prestacion.obraSocial) {
+                return this.recupero();
+            } else {
+                let dto: any = {
+                    factura: 'sumar',
+                    diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
+                    datosReportables: await facturacion[datosConfiguracionAutomatica.expresionSnomed].sumar() //this.sumar()
+                };
 
-                    return dto;
-                }
+                return dto;
             }
         },
         'sumar': {
@@ -129,7 +116,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
     let dtoSumar: any = {};
     let dtoRecupero: any = {};
 
-    let main = await facturacion[datosConfiguracionAutomatica.expresionSnomed].main(prestacion);
+    let main = await facturacion.main(prestacion);
 
     if (main.factura === 'sumar') {
         if (facturacion[main.factura].preCondicionSumar(prestacion)) {
