@@ -9,9 +9,6 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
     let afiliadoSumar: any = await querySumar.getAfiliadoSumar(pool, prestacion.paciente.dni);
 
-    const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
-    const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
-
     let datoReportable = [];
 
     let facturacion = {
@@ -19,7 +16,7 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         /* TODO: poner la expresión que corresponda */
         '2091000013100': {
             term: "otoemisiones",
-            sumar: function () {
+            sumar: function (arrayPrestacion, arrayConfiguracion) {
                 console.log("Entra a otoemisiones");
                 let dr = {
                     idDatoReportable: '',
@@ -41,21 +38,14 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 datoReportable.push(dr);
 
                 return datoReportable;
-            },
-            recupero: function () {
-                let dto = {
-                    factura: 'recupero'
-                }
-
-                return dto;
-            },
+            }
         },
 
         /* Prestación Niño Sano 410621008*/
         /* TODO: poner la expresión que corresponda */
         '410620009': {
             term: "consulta de niño sano, recién nacido",
-            sumar: async function () {
+            sumar: async function (arrayPrestacion, arrayConfiguracion) {
                 console.log("Entra a niño sano");
                 let x = 0;
 
@@ -81,12 +71,19 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
         },
         main: async function (prestacion) {
             if (prestacion.obraSocial) {
-                return this.recupero();
+                let dto: any = {
+                    factura: 'recupero'
+                }
+
+                return dto;
             } else {
+                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
+                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
+
                 let dto: any = {
                     factura: 'sumar',
                     diagnostico: datosConfiguracionAutomatica.sumar.diagnostico[0].diagnostico,
-                    datosReportables: await facturacion[datosConfiguracionAutomatica.expresionSnomed].sumar() //this.sumar()
+                    datosReportables: await facturacion[datosConfiguracionAutomatica.expresionSnomed].sumar(arrayPrestacion, arrayConfiguracion) //this.sumar()
                 };
 
                 return dto;
