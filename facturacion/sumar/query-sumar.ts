@@ -1,27 +1,76 @@
+import { runInNewContext } from "vm";
+
 const sql = require('mssql');
 
 export class QuerySumar {
     async saveComprobanteSumar(pool, dtoComprobante) {
-        let query = 'INSERT INTO dbo.PN_comprobante (cuie, id_factura, nombre_medico, fecha_comprobante, clavebeneficiario, id_smiafiliados, fecha_carga, comentario, marca, periodo, activo, idTipoDePrestacion,objectId,factAutomatico) ' +
-            ' values (@cuie, NULL, NULL, @fechaComprobante, @claveBeneficiario, @idAfiliado, @fechaCarga, @comentario, @marca, @periodo, @activo, @idTipoPrestacion, @objectId, @factAutomatico)' +
-            ' SELECT SCOPE_IDENTITY() AS id';
+        return new Promise(async (resolve, reject) => {
+            (async function () {
+                try {
+                    let query = 'INSERT INTO dbo.PN_comprobante (cuie, id_factura, nombre_medico, fecha_comprobante, clavebeneficiario, id_smiafiliados, fecha_carga, comentario, marca, periodo, activo, idTipoDePrestacion,objectId,factAutomatico) ' +
+                        ' values (@cuie, NULL, NULL, @fechaComprobante, @claveBeneficiario, @idAfiliado, @fechaCarga, @comentario, @marca, @periodo, @activo, @idTipoPrestacion, @objectId, @factAutomatico)' +
+                        ' SELECT SCOPE_IDENTITY() AS id';
 
-        let result = await new sql.Request(pool)
-            .input('cuie', sql.VarChar(10), dtoComprobante.cuie)
-            .input('fechaComprobante', sql.DateTime, dtoComprobante.fechaComprobante)
-            .input('claveBeneficiario', sql.VarChar(50), dtoComprobante.claveBeneficiario)
-            .input('idAfiliado', sql.Int, dtoComprobante.idAfiliado)
-            .input('fechaCarga', sql.DateTime, dtoComprobante.fechaCarga)
-            .input('comentario', sql.VarChar(500), dtoComprobante.comentario)
-            .input('marca', sql.VarChar(10), dtoComprobante.marca)
-            .input('periodo', sql.VarChar(7), dtoComprobante.periodo)
-            .input('activo', sql.VarChar(1), dtoComprobante.activo)
-            .input('idTipoPrestacion', sql.Int, dtoComprobante.idTipoPrestacion)
-            .input('objectId', sql.VarChar(50), dtoComprobante.objectId)
-            .input('factAutomatico', sql.VarChar(50), 'prestacion')
-            .query(query);
+                    var transaction = new sql.Transaction(pool);
+                    let idComprobante;
+                    transaction.begin().then(async function () {
+                        let result = await new sql.Request(transaction)
+                            .input('cuie', sql.VarChar(10), dtoComprobante.cuie)
+                            .input('fechaComprobante', sql.DateTime, dtoComprobante.fechaComprobante)
+                            .input('claveBeneficiario', sql.VarChar(50), dtoComprobante.claveBeneficiario)
+                            .input('idAfiliado', sql.Int, dtoComprobante.idAfiliado)
+                            .input('fechaCarga', sql.DateTime, dtoComprobante.fechaCarga)
+                            .input('comentario', sql.VarChar(500), dtoComprobante.comentario)
+                            .input('marca', sql.VarChar(10), dtoComprobante.marca)
+                            .input('periodo', sql.VarChar(7), dtoComprobante.periodo)
+                            .input('activo', sql.VarChar(1), dtoComprobante.activo)
+                            .input('idTipoPrestacion', sql.Int, dtoComprobante.idTipoPrestacion)
+                            .input('objectId', sql.VarChar(50), dtoComprobante.objectId)
+                            .input('factAutomatico', sql.VarChar(50), 'prestacion')
+                            .query(query, (err, result) => {
+                                transaction.commit(err => {
+                                    // ... error checks
+                                    idComprobante = result.recordset[0].id;
+                                    console.log("Ic comprobante 111: ", idComprobante);
 
-        return result && result.recordset ? result.recordset[0].id : null;
+                                    resolve(idComprobante);
+                                    //                        console.log("Transaction committed: .", result)
+                                });
+                                idComprobante = result.recordset[0].id;
+                                resolve(idComprobante);
+                            })
+
+                    });
+                } catch (err) {
+                    // ... error checks
+                }
+            })()
+
+            sql.on('error', err => {
+                // ... error handler
+                console.log("Errorrrrrrr");
+            })
+        });
+        // let query = 'INSERT INTO dbo.PN_comprobante (cuie, id_factura, nombre_medico, fecha_comprobante, clavebeneficiario, id_smiafiliados, fecha_carga, comentario, marca, periodo, activo, idTipoDePrestacion,objectId,factAutomatico) ' +
+        //     ' values (@cuie, NULL, NULL, @fechaComprobante, @claveBeneficiario, @idAfiliado, @fechaCarga, @comentario, @marca, @periodo, @activo, @idTipoPrestacion, @objectId, @factAutomatico)' +
+        //     ' SELECT SCOPE_IDENTITY() AS id';
+
+        // let result = await new sql.Request(pool)
+        //     .input('cuie', sql.VarChar(10), dtoComprobante.cuie)
+        //     .input('fechaComprobante', sql.DateTime, dtoComprobante.fechaComprobante)
+        //     .input('claveBeneficiario', sql.VarChar(50), dtoComprobante.claveBeneficiario)
+        //     .input('idAfiliado', sql.Int, dtoComprobante.idAfiliado)
+        //     .input('fechaCarga', sql.DateTime, dtoComprobante.fechaCarga)
+        //     .input('comentario', sql.VarChar(500), dtoComprobante.comentario)
+        //     .input('marca', sql.VarChar(10), dtoComprobante.marca)
+        //     .input('periodo', sql.VarChar(7), dtoComprobante.periodo)
+        //     .input('activo', sql.VarChar(1), dtoComprobante.activo)
+        //     .input('idTipoPrestacion', sql.Int, dtoComprobante.idTipoPrestacion)
+        //     .input('objectId', sql.VarChar(50), dtoComprobante.objectId)
+        //     .input('factAutomatico', sql.VarChar(50), 'prestacion')
+        //     .query(query);
+
+        // return result && result.recordset ? result.recordset[0].id : null;
     }
 
     async savePrestacionSumar(pool, dtoPrestacion) {
@@ -67,7 +116,7 @@ export class QuerySumar {
             .input('valor', sql.VarChar(500), dtoPrestacion.valor)
             .query(query);
 
-        if (result && result.recordset) {            
+        if (result && result.recordset) {
             let idDatoReportable = result.recordset[0].id;
         }
     }

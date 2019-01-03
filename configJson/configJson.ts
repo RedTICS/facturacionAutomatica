@@ -77,8 +77,8 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
                 return dto;
             } else {
-                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr) => dr);
-                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config) => config.valores);
+                const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr: any) => dr);
+                const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config: any) => config.valores);
 
                 let dto: any = {
                     factura: 'sumar',

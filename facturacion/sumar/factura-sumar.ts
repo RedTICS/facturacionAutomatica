@@ -18,7 +18,13 @@ export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
         objectId: dtoSumar.objectId
     };
 
+    const transaction = pool.transaction();
+
+    // let pepe = await transaction.begin();    
     let idComprobante = await querySumar.saveComprobanteSumar(pool, dtoComprobante);
+    console.log("Id comprobante: ", idComprobante);
+    // let capo = await transaction.commit();    
+
     let precioPrestacion = await querySumar.getNomencladorSumar(pool, datosConfiguracionAutomatica.sumar.idNomenclador)
 
     let prestacion = {
@@ -39,18 +45,20 @@ export async function facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica)
         dia: dtoSumar.dia,
     }
 
+    // await transaction.begin();
     let idPrestacion = await querySumar.savePrestacionSumar(pool, prestacion);
- 
-    for  (let x = 0; x < dtoSumar.datosReportables.length; x++) {
+    // await transaction.commit();
+
+    for (let x = 0; x < dtoSumar.datosReportables.length; x++) {
         let datosReportables = {
             idPrestacion: idPrestacion,
             idDatoReportable: dtoSumar.datosReportables[x].idDatoReportable,
             valor: dtoSumar.datosReportables[x].datoReportable
         }
-    
+
         let idDatoReportable = await querySumar.saveDatosReportablesSumar(pool, datosReportables);
     }
-    
+
 }
 
 export async function saveBeneficiario() {
