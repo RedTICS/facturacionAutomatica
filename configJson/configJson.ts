@@ -49,8 +49,8 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 console.log("Entra a niño sano");
                 let x = 0;
 
-                arrayPrestacion.forEach((element, index) => {
-                    let data = arrayConfiguracion.find(obj => obj.conceptId == element.conceptId);
+                arrayPrestacion.forEach((element: any) => {
+                    let data = arrayConfiguracion.find((obj: any) => obj.conceptId == element.conceptId);
 
                     let dr = {
                         idDatoReportable: '',
@@ -69,14 +69,14 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
                 return datoReportable;
             },
         },
-        main: async function (prestacion) {
-            if (prestacion.obraSocial) {
+        main: async function (prestacion: any, tipoFacturacion: any) {
+            if (tipoFacturacion === 'recupero') {
                 let dto: any = {
                     factura: 'recupero'
                 }
 
                 return dto;
-            } else {
+            } else if (tipoFacturacion === 'sumar') {
                 const arrayPrestacion = prestacion.prestacion.datosReportables.map((dr: any) => dr);
                 const arrayConfiguracion = datosConfiguracionAutomatica.sumar.datosReportables.map((config: any) => config.valores);
 
@@ -112,11 +112,28 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
 
     let dtoSumar: any = {};
     let dtoRecupero: any = {};
+    let tipoFacturacion = '';
 
-    let main = await facturacion.main(prestacion);
+    if (prestacion.obraSocial) {
+        /* Paciente tiene OS Se factura por Recupero */
+        /* TODO: Verificar si hay precondición para facturar por Recupero*/
+        
+        dtoRecupero = {
+            objectId: prestacion.turno._id,
+            dniPaciente: prestacion.paciente.dni,
+            dniProfesional: prestacion.profesional.dni,
+            codigoFinanciador: prestacion.obraSocial.codigoFinanciador,
+            idEfector: prestacion.organizacion.idSips,
+        }
 
-    if (main.factura === 'sumar') {
-        if (facturacion[main.factura].preCondicionSumar(prestacion)) {
+        facturaRecupero.facturaRecupero(pool, dtoRecupero, datosConfiguracionAutomatica);
+    } else {
+        /* Paciente NO TIENE OS se factura por Sumar */
+
+        if (facturacion['sumar'].preCondicionSumar(prestacion)) {
+            tipoFacturacion = 'sumar';
+            let main = await facturacion.main(prestacion, tipoFacturacion);
+
             dtoSumar = {
                 objectId: prestacion.turno._id,
                 cuie: prestacion.organizacion.cuie,
@@ -134,19 +151,42 @@ export async function jsonFacturacion(pool, prestacion, datosConfiguracionAutoma
             }
 
             facturaSumar.facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica);
-        } else if (afiliadoSumar) {
-
         }
-    } else if (main.factura === 'recupero') {
-
-        dtoRecupero = {
-            objectId: prestacion.turno._id,
-            dniPaciente: prestacion.paciente.dni,
-            dniProfesional: prestacion.profesional.dni,
-            codigoFinanciador: prestacion.obraSocial.codigoFinanciador,
-            idEfector: prestacion.organizacion.idSips,
-        }
-
-        facturaRecupero.facturaRecupero(pool, dtoRecupero, datosConfiguracionAutomatica);
     }
+    // let main = await facturacion.main(prestacion);
+
+    // if (main.factura === 'sumar') {
+    //     if (facturacion[main.factura].preCondicionSumar(prestacion)) {
+    //         dtoSumar = {
+    //             objectId: prestacion.turno._id,
+    //             cuie: prestacion.organizacion.cuie,
+    //             diagnostico: main.diagnostico,
+    //             dniPaciente: prestacion.paciente.dni,
+    //             claveBeneficiario: afiliadoSumar.clavebeneficiario,
+    //             idAfiliado: afiliadoSumar.id_smiafiliados,
+    //             edad: moment(new Date()).diff(prestacion.paciente.fechaNacimiento, 'years'),
+    //             sexo: (prestacion.paciente.sexo === 'masculino') ? 'M' : 'F',
+    //             fechaNacimiento: prestacion.paciente.fechaNacimiento,
+    //             anio: moment(prestacion.paciente.fechaNacimiento).format('YYYY'),
+    //             mes: moment(prestacion.paciente.fechaNacimiento).format('MM'),
+    //             dia: moment(prestacion.paciente.fechaNacimiento).format('DD'),
+    //             datosReportables: main.datosReportables
+    //         }
+
+    //         facturaSumar.facturaSumar(pool, dtoSumar, datosConfiguracionAutomatica);
+    //     } else if (afiliadoSumar) {
+
+    //     }
+    // } else if (main.factura === 'recupero') {
+
+    //     dtoRecupero = {
+    //         objectId: prestacion.turno._id,
+    //         dniPaciente: prestacion.paciente.dni,
+    //         dniProfesional: prestacion.profesional.dni,
+    //         codigoFinanciador: prestacion.obraSocial.codigoFinanciador,
+    //         idEfector: prestacion.organizacion.idSips,
+    //     }
+
+    //     facturaRecupero.facturaRecupero(pool, dtoRecupero, datosConfiguracionAutomatica);
+    // }
 }
