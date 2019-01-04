@@ -9,6 +9,7 @@
   "author": "Fantasy",
   "license": "ISC",
   "dependencies": {
+    "@types/mssql": "^4.0.11",
     "@types/node": "^10.12.7",
     "chalk": "^2.4.1",
     "figlet": "^1.2.1",
